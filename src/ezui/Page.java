@@ -11,10 +11,13 @@ public abstract class Page extends JPanel {
         this.name = name;
         this.root = new Grid(rows, cols, styles);
 
+        // Use BorderLayout to hold the ScrollPane
+        setLayout(new BorderLayout());
+
         // 2. Wrap the Root Grid in a ScrollPane
         // This handles your "Shrinking Window" wrinkle by adding scrollbars
         JScrollPane scrollPane = new JScrollPane(root);
-        scrollPane.setBorder(null); // Removes the ugly border around the scroll area
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
         // Speed up the scrolling for a better feel
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
@@ -22,9 +25,6 @@ public abstract class Page extends JPanel {
 
         // 3. Add the ScrollPane to the Frame
         super.add(scrollPane, BorderLayout.CENTER);
-
-        setLayout(new BorderLayout());
-        super.add(root, BorderLayout.CENTER);
     }
 
     public String getName() {

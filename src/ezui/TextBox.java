@@ -10,7 +10,8 @@ import java.awt.*;
  * internally uses a JTextField and provides a clean API to interact with the text field.
  */
 public class TextBox extends Component {
-    private final JTextField textField;
+    private final JPasswordField textField;
+    private final char defaultEchoChar;
 
     /**
      * Default constructor for the TextBox class. This initializes the TextBox with
@@ -20,7 +21,9 @@ public class TextBox extends Component {
      * and the JTextField is placed in the center region.
      */
     public TextBox() {
-        textField = new JTextField();
+        textField = new JPasswordField();
+        defaultEchoChar = textField.getEchoChar();
+        setMasked(false);
         textField.setFont(FontPalette.getFont("Body"));
         textField.setPreferredSize(new Dimension(150, 30));
 
@@ -34,7 +37,7 @@ public class TextBox extends Component {
      * @return the text currently entered in the text field
      */
     public String getText() {
-        return textField.getText();
+        return new String(textField.getPassword());
     }
 
     /**
@@ -44,5 +47,22 @@ public class TextBox extends Component {
      */
     public void setText(String text) {
         textField.setText(text);
+    }
+
+
+    /**
+     * Configures whether the text field in the TextBox component masks the user input, such as in password fields.
+     * When masking is enabled, the text is obscured using the default echo character.
+     * When masking is disabled, the text is displayed as plain text.
+     *
+     * @param isMasked a boolean value indicating whether the input should be masked;
+     *                 {@code true} to mask the input, {@code false} to display it as plain text
+     */
+    public void setMasked(boolean isMasked) {
+        if (isMasked) {
+            textField.setEchoChar(defaultEchoChar);
+        } else {
+            textField.setEchoChar((char)0);
+        }
     }
 }

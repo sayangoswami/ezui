@@ -6,7 +6,7 @@ import java.awt.*;
 import java.util.List;
 
 /**
- * A data-driven Table component for CS2 students.
+ * A data-driven Table component for ezui.
  * Automatically handles headers and rows from objects implementing ICsv.
  */
 public class Table<T extends ITable> extends Component {

@@ -60,10 +60,14 @@ public class Window extends JFrame {
     }
 
     public void addPage(Page page) {
+        // Prevent duplicates!
+        if (pages.containsKey(page.getName()))
+            return;
+
         page.setParentWindow(this);
         pages.put(page.getName(), page);
 
-        // 1. Initialize the student's UI
+        // 1. Initialize the UI
         page.onCreate();
 
         // 2. Add to the CardLayout

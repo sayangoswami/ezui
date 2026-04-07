@@ -47,7 +47,7 @@ public class Button extends Component {
      * @param label    The text to display on the button.
      * @param iconCode The code representing the desired icon. This corresponds to
      *                 a FontAwesomeSolid icon code (e.g., "user-circle", "home").
-     *                 You can find icon names <a href="https://fontawesome.com/v5/search?q=login&ic=free-collection">here</a>
+     *                 You can find icon names <a href="https://fontawesome.com/v5/search?ic=free-collection">here</a>
      */
     public Button(String label, String iconCode) {
         this(label); // Call an existing constructor

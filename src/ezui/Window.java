@@ -2,6 +2,8 @@ package ezui;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -17,6 +19,7 @@ public class Window extends JFrame {
     private final CardLayout cardLayout;
     private final Grid sidebarGrid;
     private int pageCount = 0;
+    private Map<String, Page> pages;
 
     /**
      * Constructs a new Window instance with the specified title, dimensions, and root grid layout.
@@ -52,9 +55,14 @@ public class Window extends JFrame {
         setMinimumSize(new Dimension(600, 400));
 
         setLocationRelativeTo(null); // Centers the window on screen
+
+        pages = new HashMap<>();
     }
 
     public void addPage(Page page) {
+        page.setParentWindow(this);
+        pages.put(page.getName(), page);
+
         // 1. Initialize the student's UI
         page.onCreate();
 
@@ -67,5 +75,11 @@ public class Window extends JFrame {
 
         // 4. Place in sidebar
         sidebarGrid.add(navButton, pageCount++, 0, Alignment.FILL);
+    }
+
+    public void showPage(String name) {
+        if (pages.containsKey(name)) {
+            cardLayout.show(contentArea, name);
+        }
     }
 }

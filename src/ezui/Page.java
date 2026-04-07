@@ -5,6 +5,7 @@ import javax.swing.*;
 
 public abstract class Page extends JPanel {
     private final String name;
+    protected Window parentWindow;
     protected final Grid root;
 
     public Page(String name, int rows, int cols, ColumnStyle... styles) {
@@ -25,6 +26,18 @@ public abstract class Page extends JPanel {
 
         // 3. Add the ScrollPane to the Frame
         super.add(scrollPane, BorderLayout.CENTER);
+    }
+
+    public void setParentWindow(Window window) {
+        this.parentWindow = window;
+    }
+
+    public void navigateTo(String pageName) {
+        if (parentWindow != null) {
+            parentWindow.showPage(pageName);
+        } else {
+            System.err.println("Error: Page '" + name + "' is not attached to a Window.");
+        }
     }
 
     public String getName() {

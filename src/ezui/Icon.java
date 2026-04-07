@@ -33,7 +33,7 @@ public class Icon extends Component {
             internalIcon = FontIcon.of(FontAwesomeSolid.valueOf(enumName));
         } catch (IllegalArgumentException e) {
             // Fallback to a question mark if the student types a code wrong
-            internalIcon = FontIcon.of(FontAwesomeSolid.valueOf("fas-question"));
+            internalIcon = FontIcon.of(FontAwesomeSolid.valueOf("QUESTION"));
             System.err.println("Warning: Icon code '" + enumName + "' not found.");
         }
 

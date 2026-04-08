@@ -125,4 +125,15 @@ public class Grid extends Component {
             getParent().revalidate();
         }
     }
+
+    public void removeAt(int row, int col) {
+        for (java.awt.Component comp : getComponents()) {
+            Object constraints = layout.getComponentConstraints(comp);
+            if (constraints != null && constraints.toString().contains("cell " + col + " " + row)) {
+                super.remove(comp);
+                break;
+            }
+        }
+        refresh();
+    }
 }

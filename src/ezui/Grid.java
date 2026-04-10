@@ -105,5 +105,34 @@ public class Grid extends Component {
                 col, row, alignConstraint);
 
         super.add(component, finalConstraints);
+        this.refresh();
+    }
+
+    /**
+     * Forces the MigLayout to recalculate the grid and redraw.
+     */
+    public void refresh() {
+        // 1. Tell MigLayout to re-calculate component constraints
+        this.revalidate();
+
+        // 2. Tell the underlying panel to physically repaint
+        this.repaint();
+
+        // 3. Optional: If the grid is inside a ScrollPane or another container,
+        // sometimes we need to trigger the parent to realize the child has grown.
+        if (getParent() != null) {
+            getParent().revalidate();
+        }
+    }
+
+    public void removeAt(int row, int col) {
+        for (java.awt.Component comp : getComponents()) {
+            Object constraints = layout.getComponentConstraints(comp);
+            if (constraints != null && constraints.toString().contains("cell " + col + " " + row)) {
+                super.remove(comp);
+                break;
+            }
+        }
+        refresh();
     }
 }

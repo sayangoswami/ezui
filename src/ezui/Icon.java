@@ -25,7 +25,7 @@ public class Icon extends Component {
      *
      * @param iconCode A string representing the FontAwesomeSolid icon code. The
      *                 icon code is case-insensitive and may include hyphens (e.g., "home", "arrow-left").
-     *                 You can find icon names <a href="https://fontawesome.com/v5/search?q=login&ic=free-collection">here</a>
+     *                 You can find icon names <a href="https://fontawesome.com/v5/search?ic=free-collection">here</a>
      */
     public Icon(String iconCode) {
         String enumName = iconCode.replace("-", "_").toUpperCase();

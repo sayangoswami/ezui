@@ -52,8 +52,10 @@ public class Button extends Component {
      * Creates a button with text and a FontAwesome icon.
      * Find valid icon names at <a href="https://fontawesome.com/v5/search?s=solid">FontAwesome v5 Solid</a>.
      *
-     * @param label    the text to display on the button
-     * @param iconCode a FontAwesomeSolid icon code, e.g. {@code "save"}, {@code "trash"}
+     * @param label    The text to display on the button.
+     * @param iconCode The code representing the desired icon. This corresponds to
+     *                 a FontAwesomeSolid icon code (e.g., "user-circle", "home").
+     *                 You can find icon names <a href="https://fontawesome.com/v5/search?ic=free-collection">here</a>
      */
     public Button(String label, String iconCode) {
         this(label);

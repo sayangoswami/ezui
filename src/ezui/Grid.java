@@ -15,15 +15,14 @@ public class Grid extends Component {
     private final MigLayout layout;
 
     /**
-     * Constructs a Grid object with the specified number of rows and columns.
-     * By default, all columns in the grid are configured to "grow" to fill the
-     * available space and "grow" to accommodate their content.
+     * Constructs a Grid where every column uses {@link ColumnStyle#GROW()}.
+     * Equivalent to calling {@code new Grid(rows, cols, ColumnStyle.GROW())}.
      *
      * @param rows the number of rows in the grid
      * @param cols the number of columns in the grid
      */
     public Grid(int rows, int cols) {
-        this(rows, cols, ColumnStyle.GROW(), ColumnStyle.GROW());
+        this(rows, cols, ColumnStyle.GROW());
     }
 
     /**
@@ -49,7 +48,7 @@ public class Grid extends Component {
                 int styleIndex = Math.min(i, styles.length - 1);
                 constraint = styles[styleIndex].getConstraint();
             } else {
-                constraint = "[]"; // Default fixed style
+                constraint = ColumnStyle.GROW().getConstraint(); // Default: all columns grow
             }
             colConstraints.append(constraint);
         }

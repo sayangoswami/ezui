@@ -6,85 +6,93 @@ import java.util.List;
 
 
 /**
- * A component that provides a list box with multi-selection capability.
- * The MultiListBox class allows for adding items, retrieving selected items,
- * and clearing all items. This component integrates a scroll pane to handle overflow
- * and ensures that the list is styled with the default "Body" font from the FontPalette.
+ * A scrollable multi-selection list component backed by a {@link JList}.
+ * <p>
+ * Implements {@link Selectable} so you can react immediately whenever the
+ * user changes their selection — no button required:
+ * </p>
+ * <pre>{@code
+ * MultiListBox tagPicker = new MultiListBox(List.of("Easy", "Medium", "Hard"));
+ * tagPicker.onSelectionChange(() -> {
+ *     List<String> picked = tagPicker.getSelectedItems();
+ *     summaryText.setText("Selected: " + picked.size() + " tags");
+ * });
+ * }</pre>
  */
-public class MultiListBox extends Component {
-    final private JList<String> list;
-    final private DefaultListModel<String> model;
+public class MultiListBox extends Component implements Selectable {
+    private final JList<String> list;
+    private final DefaultListModel<String> model;
+    private Runnable selectionChangeAction;
 
     /**
-     * Constructs a new MultiListBox component, which provides functionality
-     * for displaying a list with multi-selection capability. This component
-     * utilizes a {@code DefaultListModel} to manage the list data and is
-     * integrated with a scroll pane to handle overflow.
-     * <p>
-     * The list is styled with the "Body" font from the {@code FontPalette},
-     * and it allows selection of multiple intervals using the
-     * {@code ListSelectionModel.MULTIPLE_INTERVAL_SELECTION}.
-     * <p>
-     * The component is constructed with a {@code BorderLayout}, where the list
-     * wrapped in a scroll pane is added to the center.
+     * Creates an empty MultiListBox.
      */
     public MultiListBox() {
         model = new DefaultListModel<>();
-        list = new JList<>(model);
+        list  = new JList<>(model);
         list.setFont(FontPalette.getFont("Body"));
-
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
-        // Wrap in a scroll pane to handle overflow
         JScrollPane scrollPane = new JScrollPane(list);
-
         setLayout(new BorderLayout());
         super.add(scrollPane, BorderLayout.CENTER);
+
+        // Guard with getValueIsAdjusting() so rapid drags don't spam the action —
+        // the action fires only once the user has finished selecting.
+        list.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && selectionChangeAction != null)
+                selectionChangeAction.run();
+        });
     }
 
     /**
-     * Constructs a new MultiListBox component and initializes it with the provided
-     * collection of items. Each item in the collection is added to the list displayed
-     * in this component. This constructor provides convenience for initializing
-     * the MultiListBox directly with a set of items.
-     * <p>
-     * If the provided collection is null, the MultiListBox is initialized as empty.
+     * Creates a MultiListBox pre-populated with items from the given iterable.
      *
-     * @param items an Iterable collection of objects to be added to the MultiListBox;
-     *              if null, the list will remain empty
+     * @param items the items to display; each is converted to a string via {@code toString()}
      */
     public MultiListBox(Iterable<?> items) {
         this();
         if (items == null) return;
-        for (var item : items) {
-            addItem(String.valueOf(item));
-        }
+        for (var item : items) addItem(String.valueOf(item));
     }
 
+    // ─── Items ───────────────────────────────────────────────────────────────
+
     /**
-     * Adds a new item to the list model associated with this component.
-     * The specified item will be displayed in the list managed by this component.
+     * Appends an item to the list.
      *
-     * @param item the item to be added to the list; must not be null
+     * @param item the string to add
      */
     public void addItem(String item) {
         model.addElement(item);
     }
 
     /**
-     * Retrieves a list of currently selected items from the list displayed in this component.
+     * Removes all items from the list and clears any selection.
+     */
+    public void clear() {
+        model.clear();
+    }
+
+    // ─── Selection ───────────────────────────────────────────────────────────
+
+    /**
+     * Returns all currently selected items, or an empty list if nothing is selected.
      *
-     * @return a list of strings representing the selected items, or an empty list if no items are selected
+     * @return an unmodifiable list of selected strings
      */
     public List<String> getSelectedItems() {
         return list.getSelectedValuesList();
     }
 
     /**
-     * Clears all items currently stored in the list model associated with this MultiListBox component.
-     * This method removes all elements, leaving the list in an empty state.
+     * Runs {@code action} every time the user changes their selection.
+     * Call {@link #getSelectedItems()} inside the lambda to read the new values.
+     *
+     * @param action the action to execute on selection change
      */
-    public void clear() {
-        model.clear();
+    @Override
+    public void onSelectionChange(Runnable action) {
+        this.selectionChangeAction = action;
     }
 }

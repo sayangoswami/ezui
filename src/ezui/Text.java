@@ -6,43 +6,61 @@ import javax.swing.border.EmptyBorder;
 
 
 /**
- * A class representing a text component that extends the base Component class.
- * The Text class is used for displaying textual content with a specified font style and color.
- * The text is encapsulated in a JLabel, and a layout with padding is applied to enhance its presentation.
+ * A component for displaying styled text labels, headings, and body copy.
+ * Style strings correspond to entries in {@link FontPalette}: {@code "Title"},
+ * {@code "H1"}, {@code "H2"}, {@code "H3"}, {@code "Body"}, {@code "Small"}, {@code "Label"}.
  */
 public class Text extends Component {
     private final JLabel label;
 
     /**
-     * Constructs a Text component with the specified content and font type.
-     * The Text component is displayed using a JLabel, styled with the selected font and color.
-     * A right padding of 2 pixels is added to ensure proper spacing.
+     * Creates a Text component with a specific font style.
      *
-     * @param content The textual content to be displayed within the Text component.
-     * @param fontType The type of font to be used for displaying the text, as defined in the FontPalette.
+     * @param content  the text to display
+     * @param fontType a style key from {@link FontPalette}, e.g. {@code "H1"}, {@code "Body"}, {@code "Label"}
      */
     public Text(String content, String fontType) {
         label = new JLabel(content);
         label.setFont(FontPalette.getFont(fontType));
-        label.setForeground(ColorPalette.getColor("Primary"));
+        label.setForeground(ColorPalette.getColor("Text"));
 
-        int top = 0; //(fontType.equals("H1") || fontType.equals("Title")) ? 20 : 5;
-        int bottom = 0; //(fontType.equals("H1")) ? 15 : 5;
-
-        // 2 pixels of padding on the right ensure the last character
-        // doesn't hit the "wall" of the container.
-        label.setBorder(new EmptyBorder(top, 0, bottom, 2));
+        // 2 pixels of right padding so the last character doesn't hit the cell wall
+        label.setBorder(new EmptyBorder(0, 0, 0, 2));
 
         setLayout(new BorderLayout());
         super.add(label, BorderLayout.CENTER);
+
+        // Forward hover/click events from the inner JLabel
+        forwardMouseEventsFrom(label);
     }
 
     /**
-     * Updates the text displayed in the associated label of the Text component.
+     * Creates a Text component with the default {@code "Body"} style.
      *
-     * @param content The new textual content to be displayed.
+     * @param content the text to display
+     */
+    public Text(String content) {
+        this(content, "Body");
+    }
+
+    /**
+     * Updates the displayed text.
+     *
+     * @param content the new text to display
      */
     public void setText(String content) {
         label.setText(content);
+    }
+
+    /**
+     * Changes the text foreground color using a palette key.
+     * Example: {@code text.setColor("Warning")} turns the text amber.
+     *
+     * @param colorKey a key from the active {@link ColorPalette}
+     */
+    @Override
+    public void setColor(String colorKey) {
+        label.setForeground(ColorPalette.getColor(colorKey));
+        repaint();
     }
 }

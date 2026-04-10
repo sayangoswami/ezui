@@ -1,78 +1,105 @@
 package ezui;
 
 import javax.swing.*;
+
+import org.kordamp.ikonli.swing.FontIcon;
+
 import java.awt.*;
 
 
 /**
- * A customizable button component extending the {@code Component} class.
- * Provides text and icon options along with support for click actions.
- * Internally leverages a {@code JButton} for rendering and behavior.
+ * A styled button component with text, optional icon, click and hover support.
+ * <p>
+ * By default the button uses a neutral secondary background. Call
+ * {@link #setColor(String)} to switch to any palette color — for example
+ * {@code btn.setColor("Danger")} for a red delete button.
+ * </p>
  */
 public class Button extends Component {
     protected JButton internalButton;
+    FontIcon icon;
 
     /**
-     * Creates a new {@code Button} instance with the specified label.
-     * The button leverages internal styling from predefined palettes for fonts and colors.
-     * Clicking the button triggers an associated click action if one is defined.
+     * Creates a text-only button.
      *
-     * @param label The text to display on the button.
+     * @param label the text to display on the button
      */
     public Button(String label) {
+        icon = null;
         this.setBorder(BorderFactory.createEmptyBorder());
         internalButton = new JButton(label);
 
-        // Styling from Palettes
+        // Default palette styling
         internalButton.setFont(FontPalette.getFont("Body"));
         internalButton.setBackground(ColorPalette.getColor("Secondary"));
         internalButton.setForeground(ColorPalette.getColor("Primary"));
 
-        // Layout
         setLayout(new BorderLayout());
         super.add(internalButton, BorderLayout.CENTER);
 
-        // Link the internal Swing action to our Component's clickAction
+        // Wire ActionListener → clickAction (reliable for JButton clicks)
         internalButton.addActionListener(e -> {
             if (clickAction != null) clickAction.run();
         });
+
+        // Forward hover events from the inner JButton so onHover/onHoverExit work.
+        // Use forwardHoverEventsFrom (not forwardMouseEventsFrom) to avoid firing
+        // clickAction twice — the ActionListener above already handles clicks.
+        forwardHoverEventsFrom(internalButton);
     }
 
     /**
-     * Creates a new {@code Button} instance with the specified label and an icon.
-     * The button combines text and graphical representation to enhance visual
-     * appeal and functionality. Clicking the button triggers an associated click
-     * action if one is defined.
+     * Creates a button with text and a FontAwesome icon.
+     * Find valid icon names at <a href="https://fontawesome.com/v5/search?s=solid">FontAwesome v5 Solid</a>.
      *
-     * @param label    The text to display on the button.
-     * @param iconCode The code representing the desired icon. This corresponds to
-     *                 a FontAwesomeSolid icon code (e.g., "user-circle", "home").
-     *                 You can find icon names <a href="https://fontawesome.com/v5/search?q=login&ic=free-collection">here</a>
+     * @param label    the text to display on the button
+     * @param iconCode a FontAwesomeSolid icon code, e.g. {@code "save"}, {@code "trash"}
      */
     public Button(String label, String iconCode) {
-        this(label); // Call an existing constructor
-
-        // Create the icon and set it on the internal Swing button
-        // Use YOUR Icon class to handle the "user-circle" -> USER_CIRCLE logic
+        this(label);
         Icon helper = new Icon(iconCode);
-        var icon = helper.getSwingIcon();
-
-        // Grab the processed swing icon and give it to the JButton
+        icon = helper.getSwingIcon();
         this.internalButton.setIcon(icon);
-        icon.setIconColor(ColorPalette.getColor("Info"));
+        icon.setIconColor(ColorPalette.getColor("Primary"));
     }
 
     /**
-     * Sets whether this component and its associated internal button are enabled.
-     * When disabled, both the component and its internal button will not respond
-     * to user interactions.
+     * Changes the button's background color using a palette key.
+     * <p>Example: {@code btn.setColor("Danger")} gives a red button.</p>
      *
-     * @param enabled a boolean indicating whether the component should be enabled (true)
-     *                or disabled (false)
+     * @param colorKey a key from the active {@link ColorPalette}
+     */
+    @Override
+    public void setColor(String colorKey) {
+        internalButton.setBackground(ColorPalette.getColor(colorKey));
+        final String darkBG = "Primary Focus Link TextMuted Success Info Warning Danger";
+        if (darkBG.contains(colorKey)) {
+            internalButton.setForeground(ColorPalette.getColor("Alt"));
+            if (icon != null) icon.setIconColor(ColorPalette.getColor("Alt"));
+        } else {
+            internalButton.setForeground(ColorPalette.getColor("Primary"));
+            if (icon != null) icon.setIconColor(ColorPalette.getColor("Primary"));
+        }
+        repaint();
+    }
+
+    /**
+     * Enables or disables this button. A disabled button ignores all interactions.
+     *
+     * @param enabled {@code true} to enable, {@code false} to disable
      */
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
         internalButton.setEnabled(enabled);
+    }
+
+    /**
+     * Sets the label of a button.
+     * @param text - new label
+     */
+    public void setText(String text) {
+        internalButton.setText(text);
+        repaint();
     }
 }

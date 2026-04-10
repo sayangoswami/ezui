@@ -5,64 +5,94 @@ import java.awt.*;
 
 
 /**
- * The TextBox class is a user interface component that extends the Component class.
- * It serves as a text input field, allowing users to enter and edit text. This class
- * internally uses a JTextField and provides a clean API to interact with the text field.
+ * A single-line text input field with optional placeholder text and password masking.
+ * <p>
+ * Internally holds both a plain {@link JTextField} and a {@link JPasswordField};
+ * {@link #setMasked(boolean)} swaps between them so {@link #getText()} is always safe
+ * (no deprecated {@code JPasswordField.getText()} calls).
+ * </p>
  */
 public class TextBox extends Component {
-    private final JPasswordField textField;
-    private final char defaultEchoChar;
+    private final JTextField     textField;
+    private final JPasswordField passwordField;
+    private boolean masked = false;
 
     /**
-     * Default constructor for the TextBox class. This initializes the TextBox with
-     * a JTextField for user text input. The JTextField is styled with a font defined
-     * in the FontPalette under the "Body" key and is set to a preferred size of
-     * 150x30 pixels. The layout of the TextBox is configured with a BorderLayout,
-     * and the JTextField is placed in the center region.
+     * Creates an empty, unmasked text input field.
      */
     public TextBox() {
-        textField = new JPasswordField();
-        defaultEchoChar = textField.getEchoChar();
-        setMasked(false);
-        textField.setFont(FontPalette.getFont("Body"));
-        textField.setPreferredSize(new Dimension(150, 30));
+        Font      font = FontPalette.getFont("Body");
+        Dimension size = new Dimension(150, 30);
+
+        textField = new JTextField();
+        textField.setFont(font);
+        textField.setPreferredSize(size);
+
+        passwordField = new JPasswordField();
+        passwordField.setFont(font);
+        passwordField.setPreferredSize(size);
 
         setLayout(new BorderLayout());
-        super.add(textField, BorderLayout.CENTER);
+        super.add(textField, BorderLayout.CENTER); // default: plain text
     }
 
+    // ─── Text access ─────────────────────────────────────────────────────────
+
     /**
-     * Retrieves the current text content of the text field within the TextBox component.
+     * Returns the current text in the field.
+     * Works correctly whether the field is masked or not.
      *
-     * @return the text currently entered in the text field
+     * @return the current text, never {@code null}
      */
     public String getText() {
-        return new String(textField.getPassword());
+        return masked ? new String(passwordField.getPassword()) : textField.getText();
     }
 
     /**
-     * Sets the text content of the text field within the TextBox component.
+     * Programmatically sets the text in the field.
      *
-     * @param text the text to be displayed in the text field
+     * @param text the text to display
      */
     public void setText(String text) {
-        textField.setText(text);
+        if (masked) passwordField.setText(text);
+        else        textField.setText(text);
     }
 
+    // ─── Masking ─────────────────────────────────────────────────────────────
 
     /**
-     * Configures whether the text field in the TextBox component masks the user input, such as in password fields.
-     * When masking is enabled, the text is obscured using the default echo character.
-     * When masking is disabled, the text is displayed as plain text.
+     * Switches between plain-text and password-masked input.
+     * <pre>{@code
+     * TextBox passField = new TextBox();
+     * passField.setMasked(true);  // characters appear as dots
+     * }</pre>
      *
-     * @param isMasked a boolean value indicating whether the input should be masked;
-     *                 {@code true} to mask the input, {@code false} to display it as plain text
+     * @param isMasked {@code true} to hide characters, {@code false} to show them
      */
     public void setMasked(boolean isMasked) {
-        if (isMasked) {
-            textField.setEchoChar(defaultEchoChar);
-        } else {
-            textField.setEchoChar((char)0);
-        }
+        if (this.masked == isMasked) return; // no-op if already in that state
+        this.masked = isMasked;
+        removeAll();
+        super.add(isMasked ? passwordField : textField, BorderLayout.CENTER);
+        revalidate();
+        repaint();
+    }
+
+    // ─── Placeholder ─────────────────────────────────────────────────────────
+
+    /**
+     * Sets placeholder (hint) text that appears inside the field when it is empty.
+     * The hint disappears as soon as the user starts typing.
+     * <pre>{@code
+     * TextBox nameField = new TextBox();
+     * nameField.setPlaceholder("Enter your full name…");
+     * }</pre>
+     *
+     * @param hint the placeholder string to display
+     */
+    public void setPlaceholder(String hint) {
+        // FlatLaf reads this client property to render placeholder text
+        textField.putClientProperty("JTextField.placeholderText", hint);
+        passwordField.putClientProperty("JTextField.placeholderText", hint);
     }
 }

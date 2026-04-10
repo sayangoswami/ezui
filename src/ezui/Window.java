@@ -1,9 +1,9 @@
 package ezui;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.*;
 
 
 /**
@@ -43,6 +43,17 @@ public class Window extends JFrame {
         this.sidebar.setPreferredSize(new Dimension(200, 0));
         this.sidebar.add(sidebarGrid, BorderLayout.NORTH);
 
+        // Use "Secondary" for the sidebar background so it is visually distinct from
+        // the "Background"-colored content area. setOpaque(true) is required for FlatLaf
+        // to actually honour setBackground() on a JPanel.
+        this.sidebar.setOpaque(true);
+        this.sidebar.setBackground(ColorPalette.getColor("Secondary"));
+
+        // A 1-pixel right border acts as a divider regardless of how close the
+        // sidebar and content colors are.
+        this.sidebar.setBorder(BorderFactory.createMatteBorder(
+                0, 0, 0, 1, ColorPalette.getColor("Focus")));
+
         // Layout the main window
         super.setLayout(new BorderLayout());
         super.add(sidebar, BorderLayout.WEST);
@@ -75,6 +86,7 @@ public class Window extends JFrame {
 
         // 3. Create the navigation link
         Button navButton = new Button(page.getName());
+        // navButton.setColor("Alt");
         navButton.onClick(() -> cardLayout.show(contentArea, page.getName()));
 
         // 4. Place in sidebar

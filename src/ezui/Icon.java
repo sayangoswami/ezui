@@ -44,6 +44,9 @@ public class Icon extends Component {
         label = new JLabel(internalIcon);
         setLayout(new BorderLayout());
         super.add(label, BorderLayout.CENTER);
+
+        // Forward hover/click events from the inner JLabel
+        forwardMouseEventsFrom(label);
     }
 
     /**

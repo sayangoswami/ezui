@@ -77,12 +77,25 @@ public class MultiListBox extends Component implements Selectable {
     // ─── Selection ───────────────────────────────────────────────────────────
 
     /**
-     * Returns all currently selected items, or an empty list if nothing is selected.
+     * Returns all currently selected items or an empty list if nothing is selected.
      *
      * @return an unmodifiable list of selected strings
      */
     public List<String> getSelectedItems() {
         return list.getSelectedValuesList();
+    }
+
+    /**
+     * Sets the selected items in the list.
+     *
+     * @param items the list of items to select
+     */
+    public void setSelectedItems(List<String> items) {
+        int[] indices = new int[items.size()];
+        for (int i = 0; i < items.size(); i++) {
+            indices[i] = model.indexOf(items.get(i));
+        }
+        list.setSelectedIndices(indices);
     }
 
     /**

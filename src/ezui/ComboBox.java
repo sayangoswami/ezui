@@ -72,6 +72,13 @@ public class ComboBox extends Component implements Selectable {
     }
 
     /**
+     * Sets the currently selected item.
+     *
+     * @param item the string to select
+     */
+    public void setSelectedItem(String item) {combo.setSelectedItem(item);}
+
+    /**
      * Runs {@code action} every time the user picks a different item.
      * Call {@link #getSelectedItem()} inside the lambda to read the new value.
      *

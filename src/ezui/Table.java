@@ -72,7 +72,7 @@ public class Table<T extends ITable> extends Component {
 
         if (dataSource != null && !dataSource.isEmpty()) {
             // Identify headers from the first object in the list
-            String[] headers = dataSource.getFirst().getHeaders();
+            String[] headers = dataSource.get(0).getHeaders();
             model.setColumnIdentifiers(headers);
 
             // Add all rows
